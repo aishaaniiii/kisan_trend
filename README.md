@@ -17,3 +17,4 @@ The data invovles:
 
 For data the following was used: 
 https://power.larc.nasa.gov/data-access-viewer/ 
+<img width="606" height="693" alt="image" src="https://github.com/user-attachments/assets/cb837f4e-bfb7-47a6-b469-67eef4426dfe" />
