@@ -15,3 +15,5 @@ The data invovles:
 - Max 2m Air Temperature. Peak daytime heat at the crop canopy height. Too warm and the crops get crispy, too cold and they can die.
 - NDVI, Vegetation health. This is a 'Greenness Index', measures how dense and healthy crops are from space, can be then connect to the trends in variables mentioned above and for future analysis. Also can be used to see how crops perform in rainy seasons versus seasons of draught.
 
+For data the following was used: 
+https://power.larc.nasa.gov/data-access-viewer/ 
