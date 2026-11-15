@@ -1,0 +1,23 @@
+# Autosave and backup files
+*.asv
+*~
+*.m~
+
+# Compiled MEX binaries (Windows, macOS, Linux)
+*.mex*
+
+# Simulink cache and autosave files
+*.slxc
+*.autosave
+slprj/
+sfprj/
+
+# MATLAB Coder build folders
+codegen/
+
+# Packaging and temporary build artifacts
+*.mltbx
+*.mlappinstall
+
+# Optional: Uncomment the line below if you generate large .mat data files
+# *.mat
