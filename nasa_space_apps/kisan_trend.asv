@@ -1,0 +1,100 @@
+clear
+clc
+close all 
+
+%getting data 
+
+%this is the location of Ludhiana, an agricultural hub in Punjab, India
+
+if ~isfile(filename) %checking if file already exists
+    lat = 30.90;
+    lon = 75.85;
+    params = 'T2M_MAX,PRECTOTCORR,GWETROOT';
+
+    url = sprintf(['https://power.larc.nasa.gov/api/temporal/monthly/point?' ...
+        'parameters=%s&community=AG&longitude=%.4f&latitude=%.4f' ...
+        '&start=2001&end=2025&format=CSV'], params, lon, lat);
+
+    disp('Downloading data from NASA POWER...');
+    websave(filename, url);
+    disp('Download complete! Saved to punjab_agro.csv');
+else
+    disp('punjab_agro.csv already exists. Skipping download.');
+end
+
+
+%parsing the data 
+
+%first finding where the data starts
+lines = readlines(filename);
+header = find(startsWith(lines, 'PARAMETER'));
+opts = detectImportOptions(filename, 'NumHeaderLines', header - 1);
+raw_table = readtable(filename, opts); 
+
+%now replacing >999 with NaN and getting the months across 2001 - 2025
+months_p = {'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'};
+dataMat = raw_table{:,months};
+dataMat(dataMat <= -990) = NaN;
+raw_table{:, months} = dataMat;
+
+%parameter names so that they are intuitive:
+paramCodes = {'T2M_MAX', 'PRECTOTCORR', 'GWETROOT'};
+paramTitles = { ...
+    'Max 2m Air Temperature (Heat Stress)', ...
+    'Corrected Precipitation (Monsoon Supply)', ...
+    'Root Zone Soil Wetness (Crop Water Availability)'};
+paramUnits = {'°C', 'mm/day', 'fraction (0–1)'}; 
+
+%plotting the data to identify trends over the last 25 years
+
+figure('Name', 'KisanTrend: Punjab Agroclimatology Trends', 'Color', 'w', 'Position', [100, 100, 1100, 800]);
+
+for p = 1:length(paramCodes) %going through each variable, should give 3 plots (to match the number of parameters)
+    code = paramCodes{p};
+    sub = raw_Table(strcmp(raw_table.PARAMETER, code),:);
+    sub = sortrows(sub, 'YEAR');
+
+    %flattening the data for each month of each year 
+    years = sub.YEAR;
+    nYears = length(years);
+    vals = reshape(sub{:,months_p}',[],1); 
+
+    dates = datetime(repelem(years, 12), repmat((1:12)',nYears,1),15);
+    tYears = years(1) + (0:length(vals)-1)'/12; %decimal years, to have slope/year
+
+    %removing NaNs, for incompelete years 
+    valid = ~isnan(vals); %mask for non NaN values
+    vals = vals(valid);
+    dates = dates(valid);
+    tYears = tYears(valid);
+    months = month(dates);
+
+    %now finding any annomalies, e.g. a heavier monsoon season
+
+    anomalies = zeros(size(vals));
+
+    for m = 1:12
+        idx = (months == m); 
+        anomalies(idx) = vals(idx) - mean(vals(idx), 'omitnan'); %finding annomalies by removing the average
+    end
+
+    %linear regression for rate of change per year, 95% CI, t-test
+
+    mdl = fitlm(tyears, anomalies);
+    slope = mdl.Coefficients.Estimate(2);
+    t_pval = mdl.Coefficients.pValue(2);
+    ci = coefCI(mdl);
+    slopeCI = (ci(2,2) - ci(2,1))/2;
+
+    %Mann-Kendall Non-Parametric Trend Test
+
+    [tau, mk_pval] = corr(tYears,anomalies, 'Type','Kendall');
+
+    %readable command report to window: 
+    fprintf('=== %s (%s) ===\n', paramTitles{p}, code);
+    fprintf('  Rate of Change : %+.4f %s/year (±%.4f 95%% CI)\n', slope, paramUnits{p}, slopeCI);
+    fprintf('  t-test p-value : %.4e  (%s)\n', t_pval, sigLabel(t_pval));
+    fprintf('  Mann-Kendall   : tau = %+.3f, p = %.4e (%s)\n\n', tau, mk_pval, sigLabel(mk_pval));
+
+    subplot(3,1,p);
+end
