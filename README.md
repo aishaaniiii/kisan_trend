@@ -25,7 +25,11 @@ How was the data parsed + analysed?
 - Statistical Significance Testing: separates long-term environmental shifts from random year-to-year weather noise, each variables is evaluated using:
     - Ordinary least squares linear regression + t-test: fits a straight trend line through the deseasonalised anomalies to measure the slope (rate of change per year) and a 95% confidence interval. This checks whether the slope is significantly different from zero (i.e. is there a growing trend? ).
     - Mann-Kendall trend test, as suggested in the project description. A non-parametric rank based test, used in hydrology and climate science. A standard linear regression assumes that data follows the bell-curve, this method does not and is less sensitive to extremem weather outliers. It outputs a variable 'tau', from -1 to +1 and a p-value.
-    - Interpreting results: a p-value < 0.05 (or of 95% confidence level) indicates that the trend is statistically significant, and unlikely to have occurred by random change. 
+    - Interpreting results: a p-value < 0.05 (or of 95% confidence level) indicates that the trend is statistically significant, and unlikely to have occurred by random change.
+ 
+Final Graph: 
+<img width="3442" height="2237" alt="punjab_trends_summary" src="https://github.com/user-attachments/assets/2b71fc1d-85be-4ab5-bc01-4931e371b083" />
+
 
 
 
