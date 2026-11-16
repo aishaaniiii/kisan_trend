@@ -28,4 +28,5 @@ How was the data parsed + analysed?
     - Interpreting results: a p-value < 0.05 (or of 95% confidence level) indicates that the trend is statistically significant, and unlikely to have occurred by random change. 
 
 
+<img width="3442" height="2237" alt="punjab_trends_summary" src="https://github.com/user-attachments/assets/c7e92c5d-6a55-49e5-8d24-f30cc37fca4c" />
 
